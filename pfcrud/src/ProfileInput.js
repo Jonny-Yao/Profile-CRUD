@@ -11,10 +11,6 @@ export const ProfileInput = ({pf}) =>{
     const[About, setAbout] = React.useState(pf.About);
     const [modalShow, setModalShow] = React.useState(false);
 
-    const onUpdate = () =>{
-        const db = firebase.firestore();
-        db.collection('profiles').doc(pf.id).set({...pf, Name});
-    }
     const onDelete = () =>{
         const db = firebase.firestore();
         db.collection('profiles').doc(pf.id).delete();
@@ -40,6 +36,7 @@ export const ProfileInput = ({pf}) =>{
                 onHide={() => setModalShow(false)}
                 name = {Name}
                 about = {About}
+                pfid = {pf.id}
             />
         </div>
     );
