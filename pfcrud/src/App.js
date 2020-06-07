@@ -9,13 +9,13 @@ import {CreateProfile} from './CreateProfile';
 import Navbar from 'react-bootstrap/Navbar';
 
 const ProfileBox = styled.div`
-  margin:.2%;
+  margin:1%;
  `;
 
  const Layout = styled.div`
  display: flex;
 flex-wrap: wrap;
-text-align:center;
+justify-content: center;
  `;
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
 
   {/*loads in all of the profiles into profile state */}
   React.useEffect(() => {
-    firebase.firestore()
+    const unsubscribe = firebase.firestore()
     .collection('profiles')
     .onSnapshot((snapshot) => {
       const newpf = snapshot.docs.map((doc)=> ({
@@ -33,6 +33,8 @@ function App() {
 
       setProfiles(newpf);
     });
+    {/*deletes the web socket for firebase when we unmount */}
+    return () => unsubscribe();
   }, []);
 
   return (

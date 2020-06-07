@@ -4,16 +4,20 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import styled from 'styled-components';
 import Form from 'react-bootstrap/Form';
+import Toast from 'react-bootstrap/Toast';
 
 function MyVerticallyCenteredModal(props) {
     const [editText, setEditText] = React.useState(true);
     const [profileAbout, setProfileAbout] = React.useState(props.about);
+    const [update, showUpdate] = React.useState(false);
 
     const onUpdate = () =>{
         const db = firebase.firestore();
         db.collection('profiles').doc(props.pfid).update({About: profileAbout});
         setEditText(true);
+        showUpdate(true); //shows a notification that you updated successfully
         props.onHide(); //this closes the modal when you create a profile
+        
     }
 
     const closeWindow = ()=>{
@@ -24,6 +28,18 @@ function MyVerticallyCenteredModal(props) {
 
     return (
         <>
+        {/*this is the hidden alert for when a profile is updated */}
+         <Toast onClose={() => showUpdate(false)} show={update} delay={3000} autohide animation style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            backgroundColor: 'green'
+          }}>
+            <Toast.Header>
+                <strong >Update Successful</strong>
+          </Toast.Header>
+        </Toast>
+
         <Modal
             {...props}
             size="lg"
@@ -39,7 +55,7 @@ function MyVerticallyCenteredModal(props) {
 
             <Form>
                 <Form.Group value={profileAbout} onChange ={(e)=> setProfileAbout(e.target.value)} >
-                    <Form.Control style={{backgroundColor:'white'}}onClick={()=> setEditText(false)} defaultValue={profileAbout} readOnly={editText} as="textarea" rows="3" />
+                    <Form.Control style={{backgroundColor:'#F8F8F8'}}onClick={()=> setEditText(false)} defaultValue={profileAbout} readOnly={editText} as="textarea" rows="3" />
                     <Form.Text className="text-muted">
                     Click on the text to edit
                     </Form.Text>

@@ -4,18 +4,34 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import styled from 'styled-components';
 import Form from 'react-bootstrap/Form';
+import Toast from 'react-bootstrap/Toast';
 
 function CreationModal(props) {
     const [newProfile, setNewProfile] = React.useState();
     const [newProfileAbout, setNewProfileAbout] = React.useState();
+    const [update, showUpdate] = React.useState(false);
 
     const onCreate = () =>{
         const db = firebase.firestore();
         db.collection('profiles').add({Name: newProfile, About: newProfileAbout});
+        showUpdate(true); //shows a notification that you created successfully
         props.onHide(); //this closes the modal when you create a profile
     }
 
     return (
+        <>
+        {/*this is the hidden alert for when a profile is created */}
+        <Toast onClose={() => showUpdate(false)} show={update} delay={3000} autohide animation style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            backgroundColor: 'green'
+          }}>
+            <Toast.Header>
+                <strong >New Profile Added</strong>
+          </Toast.Header>
+        </Toast>
+
       <Modal
         {...props}
         size="lg"
@@ -45,14 +61,15 @@ function CreationModal(props) {
 
             
         </Form>
-        {/*button to create new profile */}
-        <Button onClick={onCreate} variant="primary" >Create</Button>
 
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer >
+        {/*button to create new profile */}
+          <Button onClick={onCreate} variant="primary" >Create</Button>
           <Button onClick={props.onHide} variant="secondary">Close</Button>
         </Modal.Footer>
       </Modal>
+      </>
     );
   }
 
