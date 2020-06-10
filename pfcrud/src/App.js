@@ -28,10 +28,7 @@ text-align:center;
 function App() {
   const [profiles, setProfiles] = React.useState([]);
   const [search, setSearchCriteria] = React.useState(''); //set it as empty to begin with
-  const [itemsPerPage, setItemsPerPage] = React.useState(5);
   const [endComponent, setEndComponent] =React.useState(5);
-  const [disableLeftScroll, setDisableLeftScroll] = React.useState(false); //makes sure users dont go over values
-  const [disableRightScroll, setDisableRightScroll] = React.useState(false); //makes sure users dont go over intended profiles
   {/*loads in all of the profiles into profile state */}
   React.useEffect(() => {
 
@@ -82,6 +79,7 @@ function App() {
           <CreateProfile pf={'add'}/>
         </ProfileBox>
         {/*were mapping from filtered profiles which has the search filter applied */}
+        {/* slicing allows us to have a load more feature*/}
         {filteredProfiles.slice(0,endComponent).map(pf =>  (
           
           <ProfileBox key={pf.Name}> 
@@ -91,7 +89,8 @@ function App() {
         ))}
 
       </Layout>
-      <Button disabled={disableLeftScroll} size="lg" variant="light" onClick={()=> setEndComponent(endComponent+5)}> Load More </Button> 
+      {/*load more function that allows 5 more profiles to be shown */}
+      <Button size="lg" variant="light" onClick={()=> setEndComponent(endComponent+5)}> Load More </Button> 
       
       
     </Frame>
