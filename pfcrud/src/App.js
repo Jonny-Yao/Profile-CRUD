@@ -7,6 +7,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import styled from 'styled-components';
 import {CreateProfile} from './CreateProfile';
 import Navbar from 'react-bootstrap/Navbar';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import FormControl from 'react-bootstrap/FormControl';
 
 const ProfileBox = styled.div`
   margin:1%;
@@ -18,13 +21,23 @@ flex-wrap: wrap;
 justify-content: center;
  `;
 
+ const Frame = styled.div`
+text-align:center;
+ `;
+
 function App() {
   const [profiles, setProfiles] = React.useState([]);
-
+  const [search, setSearchCriteria] = React.useState(''); //set it as empty to begin with
+  const [itemsPerPage, setItemsPerPage] = React.useState(5);
+  const [endComponent, setEndComponent] =React.useState(5);
+  const [disableLeftScroll, setDisableLeftScroll] = React.useState(false); //makes sure users dont go over values
+  const [disableRightScroll, setDisableRightScroll] = React.useState(false); //makes sure users dont go over intended profiles
   {/*loads in all of the profiles into profile state */}
   React.useEffect(() => {
+
     const unsubscribe = firebase.firestore()
     .collection('profiles')
+    .orderBy("Name")
     .onSnapshot((snapshot) => {
       const newpf = snapshot.docs.map((doc)=> ({
         id: doc.id,
@@ -33,12 +46,19 @@ function App() {
 
       setProfiles(newpf);
     });
+    
     {/*deletes the web socket for firebase when we unmount */}
     return () => unsubscribe();
   }, []);
 
+  //this filters the profiles to include only what's in the search bar
+  const filteredProfiles = profiles.filter(p=>{
+    return p.Name.toLowerCase().indexOf(search) > -1; 
+  });
+
+
   return (
-    <div>
+    <Frame>
       <Navbar bg="dark">
         <Navbar.Brand href="#home">
           <img
@@ -49,6 +69,11 @@ function App() {
             alt="React Bootstrap logo"
           />
         </Navbar.Brand>
+        {/*search bar to filter desired components*/}
+        <Form inline >
+          <FormControl type="text" placeholder="Search" onChange ={(e)=> setSearchCriteria(e.target.value.toLowerCase())} />
+        </Form>
+
       </Navbar>
 
       <Layout>
@@ -56,17 +81,20 @@ function App() {
         <ProfileBox key={'add'}>
           <CreateProfile pf={'add'}/>
         </ProfileBox>
-
-        {profiles.map(pf =>  (
+        {/*were mapping from filtered profiles which has the search filter applied */}
+        {filteredProfiles.slice(0,endComponent).map(pf =>  (
           
           <ProfileBox key={pf.Name}> 
             <ProfileInput pf={pf}/>
           </ProfileBox>
 
         ))}
-      </Layout>
 
-    </div>
+      </Layout>
+      <Button disabled={disableLeftScroll} size="lg" variant="light" onClick={()=> setEndComponent(endComponent+5)}> Load More </Button> 
+      
+      
+    </Frame>
   );
 }
 
